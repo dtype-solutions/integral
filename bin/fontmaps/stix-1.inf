@@ -1,0 +1,216 @@
+# Font and Attribute Mapping Table (Fontmap) for Unicode Text Output
+#
+# This font and attribute mapping table (or Fontmap) is read when INTEGRAL
+# Engine lays out Unicode text. The Fontmap allows INTEGRAL clients to
+# explicitly assign various scripts and/or characters defined within the
+# Unicode Standard to a default set of text layout attributes and fonts.
+# This makes it possible to properly display any user-supplied text, in
+# both horizontal and vertical writing mode.
+#
+# When processing the Fontmap, INTEGRAL reads the rows with mapping
+# instructions one at a time. As soon as the first matching Unicode script
+# or character range is found, INTEGRAL applies the mapping instructions
+# in that row and stops reading and processing any subsequent rows.
+#
+# Each row in the Fontmap consists of precisely three fields, separated
+# by a single vertical bar, i.e. pipe (|):
+#
+# * 1st Field - Unicode script or character range
+# * 2nd Field - Assigned set of text layout attributes
+# * 3rd Field - Assigned font(s)
+#
+# Example:
+#
+# SCRIPTCODE:latn|ATTRIBS:ro=8,ts=10025|FONTNAME:Times;+FONTNAME:Arial
+#
+# Any given Unicode script or character range can be assigned a single
+# set of text layout attributes and one or more fonts. If multiple fonts
+# are assigned, it means they are all suitable for the display of the
+# specified Unicode script or character range. The order in which fonts
+# are listed is important -- the first suitable font, as determined by
+# the instructions described below, is always chosen as the default.
+#
+# -----------
+# First Field
+# -----------
+#
+# Within the first field, the CHARCODE, CHARSPAN or SCRIPTCODE
+# instruction specifies a character range or Unicode script:
+#
+# * CHARCODE selects a single Unicode character using an 8-digit
+#   hexadecimal integer.
+#
+#   Example: CHARCODE:0000004E
+#
+# * CHARSPAN selects a range of Unicode characters using two
+#   8-digit hexadecimal integers (first and last).
+#
+#   Example: CHARSPAN:0000004E-0000005A
+#
+#   Note: CHARCODE and CHARSPAN have a higher priority than
+#   SCRIPTCODE described below.
+#
+# * SCRIPTCODE selects a Unicode script using a 4 character script
+#   code (e.g. latn, cyrl, arab, kana etc). See ISO 15924 Code Lists
+#   for a list of available script codes.
+#
+#   Example: SCRIPTCODE:arab
+#
+#   Note 1: Script code 0000 is a special code which means any script.
+#   Fonts associated with this script are usually fallback fonts, i.e.
+#   fonts that are used in the absence of a more suitable alternative.
+#   As such, SCRIPTCODE:0000 should be specified after all other
+#   SCRIPTCODE instructions.
+#
+#   Note 2: The best fallback fonts are those that are specifically
+#   designed to support a large number of Unicode characters and
+#   scripts, such as Arial Unicode MS and Code2000.
+#
+# ------------
+# Second Field
+# ------------
+#
+# Within the second field, the ATTRIBS instruction specifies the
+# associated set of text layout attributes. This set is supplied as a
+# comma separated list of keyword/value pairs. Currently two attribute
+# keywords are supported:
+#
+# * ro (relative orientation)
+#
+#   The ro attribute keyword corresponds to INTEGRAL Engine's
+#   pdRelativeOrientation property and TX_ATTR_ORIENTATION attribute
+#   identifier. This attribute allows INTEGRAL clients to set the most
+#   appropriate relative text orientation (portrait/landscape) and
+#   baseline (e.g. default, shifted) for the associated Unicode script
+#   or character range and font(s), in both horizontal and vertical
+#   writing mode.
+#
+# * ts (text shaping)
+#
+#   The ts attribute keyword corresponds to INTEGRAL Engine's
+#   pdTextShaping property and TX_ATTR_SHAPING attribute identifier.
+#   When required, this attribute allows INTEGRAL clients to explicitly
+#   set the text shaping method for the associated Unicode script or
+#   character range and font(s). If this attribute is not specified,
+#   the shaping method will be set automatically based on the Unicode
+#   script.
+#
+# Examples:
+#
+#   ATTRIBS:ro=2
+#   ATTRIBS:ro=8,ts=10025
+#
+# -----------
+# Third Field
+# -----------
+#
+# Within the third field, the associated font can be identified by its
+# name or Unique Font Identifier (font_uid). To accomplish this, one of
+# the following four instructions can be used:
+#
+# * FONTFUID
+#
+#   Specifies the font by its Unique Font Identifier (font_uid). This
+#   instruction also performs some basic validation on the font file
+#   and attempts to activate it. As a result, missing, inaccessible,
+#   invalid and/or corrupt fonts are rejected as suitable fonts.
+#
+#   Example: FONTFUID:S001R_ARIAL_001A
+#
+# * FASTFUID
+#
+#   Same as FONTFUID but noticeably faster since it does not perform any
+#   validation on the font file and does not attempt to activate it. Thus,
+#   any specified font is accepted as a suitable font.
+#
+#   Example: FASTFUID:S001R_ARIAL_001A
+#
+# * FONTNAME
+#
+#   Specifies the font by its name. This instruction also performs some
+#   basic validation on the font file and attempts to activate it. As a
+#   result, missing, inaccessible, invalid and/or corrupt fonts are
+#   rejected as suitable fonts. This instruction is slower than FONTFUID
+#   and FASTFUID since it must access the font file and parse its header
+#   to extract the font name.
+#
+#   Example: FONTNAME:Times New Roman
+#
+# * FASTNAME
+#
+#   Same as FONTNAME but does not perform any validation on the font and
+#   does not attempt to activate it. Thus, any specified font is accepted
+#   as a suitable font.
+#
+#   Example: FASTNAME:Times New Roman
+#
+# Multiple Fonts:
+#
+# To associate multiple fonts with the same Unicode script or character
+# range, two different methods are available:
+#
+# Method 1: Within the third field, multiple font instructions can be
+# concatenated using the ;+ operator, as shown in the following example:
+#
+# SCRIPTCODE:kana|ATTRIBS:ro=2|FONTNAME:Code2000;+FONTFUID:F0011_ARPLSH_NS0
+#
+# Method 2: Multiple rows that target the same Unicode script or character
+# range, but assign different fonts, can be added to the Fontmap. This is
+# shown in the following example:
+#
+# SCRIPTCODE:kana|ATTRIBS:ro=2|FONTNAME:Code2000
+# SCRIPTCODE:kana|ATTRIBS:ro=2|FONTFUID:F0011_ARPLSH_NS0
+#
+# Note that the first method is more compact as it requires only one row
+# per Unicode script or character range. However, the second method is
+# slightly more flexible as it provides the ability to specify different
+# text layout attributes for different fonts.
+#
+# ----------------
+# Additional Notes
+# ----------------
+#
+# * It is the client's responsibility to ensure that the fonts listed in
+#   the Fontmap have a sufficient number of glyphs to adequately represent
+#   all of the Unicode scripts and character ranges they are associated
+#   with. Only associate a font with a Unicode script or character range
+#   if you know it provides adequate support for that particular script or
+#   character range. You can use INTEGRAL Font Viewer to check your font's
+#   support for the intended Unicode script or character range.
+#
+# * For more information on the Unique Font Identifiers (font_uid),
+#   see the Configure Initial Font List document.
+#
+# * For more information on Unicode Scripts and script codes, relative
+#   orientation and text shaping, see the manual.
+#
+
+{
+SCRIPTCODE:zzzz|ATTRIBS:ts=0|FASTFUID:F0011_STIX1__NS0
+SCRIPTCODE:zyyy|ATTRIBS:ro=8|FASTFUID:F0011_STIX1__NS0
+SCRIPTCODE:latn|ATTRIBS:ro=8|FASTFUID:F0011_STIX1__NS0
+SCRIPTCODE:cyrl|ATTRIBS:ro=8|FASTFUID:F0011_STIX1__NS0
+SCRIPTCODE:grek|ATTRIBS:ro=8|FASTFUID:F0011_STIX1__NS0
+SCRIPTCODE:hani|ATTRIBS:ro=2|FASTFUID:F0010_ARIUNI_NS0;+FASTFUID:F0011_ARPLSH_NS0;+FASTFUID:F0011_NSANS2_NS0;+FASTFUID:F0011_CODE2K_SS0
+SCRIPTCODE:hira|ATTRIBS:ro=2|FASTFUID:F0010_ARIUNI_NS0;+FASTFUID:F0011_CODE2K_SS0;+FASTFUID:F0011_ARPLSH_NS0
+SCRIPTCODE:kana|ATTRIBS:ro=2|FASTFUID:F0010_ARIUNI_NS0;+FASTFUID:F0011_CODE2K_SS0;+FASTFUID:F0011_ARPLSH_NS0
+SCRIPTCODE:hang|ATTRIBS:ro=8|FASTFUID:F0010_ARIUNI_NS0;+FASTFUID:F0011_CODE2K_SS0
+SCRIPTCODE:hebr|ATTRIBS:ro=8|FASTFUID:F0010_DEJAVU_NS0;+FASTFUID:F0010_ARIAL__NS0;+FASTFUID:F0010_TAHOMA_NS0;+FASTFUID:F0011_TIMES__NS0
+SCRIPTCODE:arab|ATTRIBS:ro=8|FASTFUID:F0010_ARIAL__NS0;+FASTFUID:F0010_TAHOMA_NS0;+FASTFUID:F0011_TIMES__NS0
+SCRIPTCODE:deva|ATTRIBS:ro=8|FASTFUID:F0010_THRAB__NS0
+SCRIPTCODE:thai|ATTRIBS:ro=8|FASTFUID:F0010_TAHOMA_NS0
+SCRIPTCODE:0000|ATTRIBS:ro=8|FASTFUID:F0010_ARIUNI_NS0;+FASTFUID:F0011_CODE2K_SS0;+FASTFUID:F0011_STIX1__NS0
+CHARCODE:0000FF01|ATTRIBS:ro=2|FASTFUID:F0010_ARIUNI_NS0;+FASTFUID:F0011_ARPLSH_NS0;+FASTFUID:F0011_NSANS2_NS0;+FASTFUID:F0011_CODE2K_SS0
+CHARCODE:0000FF0C|ATTRIBS:ro=2|FASTFUID:F0010_ARIUNI_NS0;+FASTFUID:F0011_ARPLSH_NS0;+FASTFUID:F0011_NSANS2_NS0;+FASTFUID:F0011_CODE2K_SS0
+CHARCODE:0000FF1A|ATTRIBS:ro=2|FASTFUID:F0010_ARIUNI_NS0;+FASTFUID:F0011_ARPLSH_NS0;+FASTFUID:F0011_NSANS2_NS0;+FASTFUID:F0011_CODE2K_SS0
+CHARCODE:0000FF1B|ATTRIBS:ro=2|FASTFUID:F0010_ARIUNI_NS0;+FASTFUID:F0011_ARPLSH_NS0;+FASTFUID:F0011_NSANS2_NS0;+FASTFUID:F0011_CODE2K_SS0
+CHARCODE:0000FF1F|ATTRIBS:ro=2|FASTFUID:F0010_ARIUNI_NS0;+FASTFUID:F0011_ARPLSH_NS0;+FASTFUID:F0011_NSANS2_NS0;+FASTFUID:F0011_CODE2K_SS0
+CHARCODE:0000FF3B|ATTRIBS:ro=8|FASTFUID:F0010_ARIUNI_NS0;+FASTFUID:F0011_ARPLSH_NS0;+FASTFUID:F0011_NSANS2_NS0;+FASTFUID:F0011_CODE2K_SS0
+CHARCODE:0000FF3D|ATTRIBS:ro=8|FASTFUID:F0010_ARIUNI_NS0;+FASTFUID:F0011_ARPLSH_NS0;+FASTFUID:F0011_NSANS2_NS0;+FASTFUID:F0011_CODE2K_SS0
+CHARSPAN:0000FF08-0000FF09|ATTRIBS:ro=8|F0010_ARIUNI_NS0;+FASTFUID:F0011_ARPLSH_NS0;+FASTFUID:F0011_NSANS2_NS0;+FASTFUID:F0011_CODE2K_SS0
+CHARSPAN:00003001-00003002|ATTRIBS:ro=2|FASTFUID:F0010_ARIUNI_NS0;+FASTFUID:F0011_ARPLSH_NS0;+FASTFUID:F0011_NSANS2_NS0;+FASTFUID:F0011_CODE2K_SS0
+CHARSPAN:00003008-00003011|ATTRIBS:ro=8|FASTFUID:F0010_ARIUNI_NS0;+FASTFUID:F0011_ARPLSH_NS0;+FASTFUID:F0011_NSANS2_NS0;+FASTFUID:F0011_CODE2K_SS0
+CHARSPAN:00003014-00003019|ATTRIBS:ro=8|FASTFUID:F0010_ARIUNI_NS0;+FASTFUID:F0011_ARPLSH_NS0;+FASTFUID:F0011_NSANS2_NS0;+FASTFUID:F0011_CODE2K_SS0
+}
+
+# END OF FILE
