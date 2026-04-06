@@ -16,10 +16,11 @@ int main(int main_argc, char* main_argv[])
 
 	std::cout << "------------------------------------------------------\n";
 	std::cout << "D-TYPE SCRIPT INTERPRETER: INTEGRAL OUTPUT DEMO\n";
-	std::cout << "Source File: examples/e-integral_output/main.cpp\n";
+	std::cout << "Source File: example-job_letter/main.cpp\n";
 	std::cout << "------------------------------------------------------\n";
 	std::cout << "\n";
-	std::cout << "This sample program shows how to render advanced text.\n";
+	std::cout << "This sample program shows how to create, format and draw a simple 2-page\n";
+	std::cout << "job recommendation letter.\n";
 	std::cout << "\n";
 	std::cout << "Additionally, this program utilizes D-Type's helper library for platform\n";
 	std::cout << "independent window display, making its entire source code fully portable\n";
@@ -40,7 +41,7 @@ int main(int main_argc, char* main_argv[])
 	std::cout << "TO QUIT THE PROGRAM, CLOSE ALL OTHER OPEN WINDOWS.\n";
 	std::cout << "\n";
 
-	CDTEngine engine;
+	CDTEngineV10 engine;
 
 	DT_STREAM_FILE(sd_init, "config/dtype.inf");
 	DT_STREAM_FILE(sd_fontmap, "config/fontmap.inf");

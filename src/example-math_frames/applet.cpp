@@ -28,13 +28,13 @@ class CDTApplet : public CDTWindow
 {
 public:
 
-	CDTApplet(CDTEngine& engine, CDTDisplay& display, DT_FLOAT zoom = 1.0) : CDTWindow(&display), Engine(engine)
+	CDTApplet(CDTEngineV10& engine, CDTDisplay& display, DT_FLOAT zoom = 1.0) : CDTWindow(&display), Engine(engine)
 	{
 		Init();
 		Zoom *= zoom;
 	}
 
-	CDTApplet(CDTEngine& engine, CDTDisplay& display, const DT_CHAR* title, DT_SLONG w, DT_SLONG h, DT_ULONG flags = 0, DT_FLOAT zoom = 1.0) : CDTWindow(&display, title, w, h, flags), Engine(engine)
+	CDTApplet(CDTEngineV10& engine, CDTDisplay& display, const DT_CHAR* title, DT_SLONG w, DT_SLONG h, DT_ULONG flags = 0, DT_FLOAT zoom = 1.0) : CDTWindow(&display, title, w, h, flags), Engine(engine)
 	{
 		Init();
 		Zoom *= zoom;
@@ -91,9 +91,9 @@ private:
 	DT_FLOAT Zoom;
 	DT_SWORD Page;
 
-	CDTDoc Doc;
+	CDTDocV10 Doc;
 
-	CDTEngine& Engine;
+	CDTEngineV10& Engine;
 
 	DT_MDC MemorySurface;
 
